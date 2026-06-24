@@ -8,7 +8,7 @@
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #0f172a; /* Dark slate background */
+            background-color: #0f172a; 
             color: #f8fafc;
             margin: 0;
             padding: 40px 20px;
@@ -16,7 +16,7 @@
             justify-content: center;
         }
         .container {
-            background-color: #1e293b; /* Card dark color */
+            background-color: #1e293b; 
             padding: 30px;
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.3);
@@ -134,7 +134,7 @@
 </div>
 
 <script>
-let globalSentences = []; // Global variable to store sentences for the Copy All feature
+let globalSentences = []; 
 
 function breakParagraph() {
     const text = document.getElementById('paragraphInput').value.trim();
@@ -150,23 +150,24 @@ function breakParagraph() {
         return;
     }
 
-    // Direct split method using periods, question marks, exclamation marks, and Bengali Dari
-    const sentences = text.match(/[^.?!।]+[.?!机制]?/g) || [text];
-    globalSentences = sentences.map(s => s.trim()).filter(s => s !== '');
+    /* 
+      The Fix: 
+      Splits the paragraph by looking for spaces (\s+) that are immediately preceded 
+      by a sentence terminal punctuation mark (. or ? or ! or ।) using a lookbehind assertion.
+      Because decimals (1.1) do not have spaces after the dot, they are safely ignored.
+    */
+    globalSentences = text.split(/(?<=[.?!।])\s+/).map(s => s.trim()).filter(s => s !== '');
 
     countDisplay.textContent = `Total sentences found: ${globalSentences.length}`;
 
-    // Loop through sentences to generate list items and individual copy buttons
-    globalSentences.forEach((sentence, index) => {
+    globalSentences.forEach((sentence) => {
         const div = document.createElement('div');
         div.className = 'sentence-line';
 
-        // Sentence text element
         const textSpan = document.createElement('span');
         textSpan.className = 'sentence-text';
         textSpan.textContent = sentence;
 
-        // Individual copy button
         const copyBtn = document.createElement('button');
         copyBtn.className = 'copy-btn';
         copyBtn.textContent = 'Copy';
@@ -184,7 +185,6 @@ function breakParagraph() {
     resultContainer.style.display = 'block';
 }
 
-// Function to copy all processed sentences line-by-line
 function copyAllText() {
     if (globalSentences.length === 0) return;
     const allText = globalSentences.join('\n');
