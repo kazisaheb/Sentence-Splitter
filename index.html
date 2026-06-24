@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentence Splitter App</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0f172a; /* Dark slate background */
+            color: #f8fafc;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            background-color: #1e293b; /* Card dark color */
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            max-width: 650px;
+            width: 100%;
+        }
+        h2 {
+            margin-top: 0;
+            color: #f8fafc;
+            font-size: 22px;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 12px;
+            background-color: #334155;
+            border: 2px solid #475569;
+            border-radius: 8px;
+            box-sizing: border-box;
+            resize: vertical;
+            font-size: 16px;
+            color: #ffffff;
+            margin-bottom: 15px;
+            outline: none;
+        }
+        textarea:focus {
+            border-color: #6366f1;
+        }
+        button {
+            background-color: #6366f1;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background-color: #4f46e5;
+        }
+        .result-container {
+            margin-top: 25px;
+            border-top: 1px solid #334155;
+            padding-top: 20px;
+        }
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .counter {
+            font-size: 14px;
+            color: #94a3b8;
+            font-weight: bold;
+        }
+        .copy-all-btn {
+            background-color: #10b981;
+            width: auto;
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+        .copy-all-btn:hover {
+            background-color: #059669;
+        }
+        .sentence-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 16px;
+            color: #cbd5e1;
+            line-height: 1.6;
+            margin: 0;
+            padding: 10px 0;
+            border-bottom: 1px solid #334155;
+        }
+        .sentence-text {
+            flex: 1;
+            padding-right: 15px;
+        }
+        .copy-btn {
+            background-color: #475569;
+            color: #cbd5e1;
+            border: none;
+            padding: 4px 8px;
+            font-size: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: auto;
+            white-space: nowrap;
+        }
+        .copy-btn:hover {
+            background-color: #64748b;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Paragraph Sentence Splitter</h2>
+    <textarea id="paragraphInput" placeholder="Paste your paragraph here..."></textarea>
+    <button onclick="breakParagraph()">Split Sentences</button>
+
+    <div class="result-container" id="resultContainer" style="display: none;">
+        <div class="result-header">
+            <div class="counter" id="sentenceCount"></div>
+            <button class="copy-all-btn" onclick="copyAllText()">Copy All Lines</button>
+        </div>
+        <div id="sentenceList"></div>
+    </div>
+</div>
+
+<script>
+let globalSentences = []; // Global variable to store sentences for the Copy All feature
+
+function breakParagraph() {
+    const text = document.getElementById('paragraphInput').value.trim();
+    const listContainer = document.getElementById('sentenceList');
+    const resultContainer = document.getElementById('resultContainer');
+    const countDisplay = document.getElementById('sentenceCount');
+    
+    listContainer.innerHTML = '';
+
+    if (!text) {
+        resultContainer.style.display = 'none';
+        alert('Please enter some text first!');
+        return;
+    }
+
+    // Direct split method using periods, question marks, exclamation marks, and Bengali Dari
+    const sentences = text.match(/[^.?!।]+[.?!机制]?/g) || [text];
+    globalSentences = sentences.map(s => s.trim()).filter(s => s !== '');
+
+    countDisplay.textContent = `Total sentences found: ${globalSentences.length}`;
+
+    // Loop through sentences to generate list items and individual copy buttons
+    globalSentences.forEach((sentence, index) => {
+        const div = document.createElement('div');
+        div.className = 'sentence-line';
+
+        // Sentence text element
+        const textSpan = document.createElement('span');
+        textSpan.className = 'sentence-text';
+        textSpan.textContent = sentence;
+
+        // Individual copy button
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'copy-btn';
+        copyBtn.textContent = 'Copy';
+        copyBtn.onclick = function() {
+            navigator.clipboard.writeText(sentence);
+            copyBtn.textContent = 'Copied!';
+            setTimeout(() => { copyBtn.textContent = 'Copy'; }, 1500);
+        };
+
+        div.appendChild(textSpan);
+        div.appendChild(copyBtn);
+        listContainer.appendChild(div);
+    });
+
+    resultContainer.style.display = 'block';
+}
+
+// Function to copy all processed sentences line-by-line
+function copyAllText() {
+    if (globalSentences.length === 0) return;
+    const allText = globalSentences.join('\n');
+    navigator.clipboard.writeText(allText);
+    
+    const copyAllBtn = document.querySelector('.copy-all-btn');
+    copyAllBtn.textContent = 'All Copied!';
+    setTimeout(() => { copyAllBtn.textContent = 'Copy All Lines'; }, 2000);
+}
+</script>
+
+</body>
+</html>
